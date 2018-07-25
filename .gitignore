@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# Qmake user files
+*.pro.user

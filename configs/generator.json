@@ -1,0 +1,29 @@
+{
+    "num_inputs_regs" : 1,
+    "num_actives_regs" : 1,
+    "num_outputs_regs" : 1,
+
+    "dispatcher" : {
+    	"dir_to_safe_programs" : "./data/programms",
+    	"json_to_save_description" : "./data/report.json",
+    	"num_program" : 100000,
+    	"num_exec" : 6,
+    	"min_unique" : 100
+	},
+
+    "generator" : {
+        "seed" : -1,
+        "lower_const_bound" : -10,
+        "upper_const_bound" : 10,
+        "min_program_len" : 10,
+        "max_program_len" : 25
+
+    },
+
+    "executer" : {
+        "max_tests" : 1000,
+
+        "lower_input_bound" : -100,
+        "upper_input_bound" : 100
+    }
+}

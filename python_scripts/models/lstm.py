@@ -1,13 +1,13 @@
 import numpy as np
 import tensorflow as tf
 
-from attention import SimpleAttentionMechanism
+from .attention import SimpleAttentionMechanism
+from .imodel import IModel
 
 
-class LSTM(object):
+class LSTM(IModel):
 	def __init__(self,num_inputs, num_outs, learning_rate):
-		self.num_inputs = num_inputs
-		self.num_outs = num_outs
+		IModel.__init__(self,num_inputs, num_outs, learning_rate)
 
 		self._build_placeholders()
 		self._build_model()

@@ -33,3 +33,6 @@
 
 # Qmake user files
 *.pro.user
+
+# Sublime user files
+*.sublime-*

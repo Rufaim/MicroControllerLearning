@@ -9,8 +9,12 @@ win32 {
     CONFIG -= debug_and_release
 }
 
+INCLUDEPATH += ../dispatch_service/ \
+
+
 SOURCES += main.cpp \
-    programe_executer.cpp
+    ../dispatch_service/programe_executer.cpp \
+    ../dispatch_service/task_executer.cpp \
 
 
 LIBS += -L"$$OUT_PWD/../libs/controller" -l:libcontroller.a \
@@ -18,5 +22,7 @@ LIBS += -L"$$OUT_PWD/../libs/controller" -l:libcontroller.a \
         -pthread
 
 HEADERS += \
-    programe_executer.h
+    ../dispatch_service/programe_executer.h \
+    ../dispatch_service/task_executer.h \
+
 

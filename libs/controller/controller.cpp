@@ -1,6 +1,7 @@
 #include "controller.h"
 
 #include <fstream>
+#include <iostream>
 
 #include "json/json.hpp"
 
@@ -34,11 +35,16 @@ bool Controller::Init(std::vector<int> input, std::vector<std::pair<CommandID, i
             return false;
     }
 
-    input_regs_.resize(num_inputs_regs_);
-    input_regs_.assign(input.begin(),input.end());
-    work_regs_.resize(num_active_regs_);
-    output_regs_.resize(num_output_regs_);
-    program_.insert(program_.begin(),program.begin(),program.end());
+    input_regs_.clear();
+    work_regs_.clear();
+    output_regs_.clear();
+    program_.clear();
+
+    work_regs_.resize(num_active_regs_,0);
+    output_regs_.resize(num_output_regs_,0);
+
+    input_regs_= input;
+    program_ = program;
     accum_=0,
     backup_=0,
     current_work_reg_idx_=0,
@@ -150,6 +156,7 @@ bool Controller::evaluateCommand(CommandID command, int arg) {
         }
     }
     catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
         return false;
     }
 }
@@ -158,7 +165,8 @@ bool Controller::getOutputRegs(std::vector<int> &out) {
     if (state_ == ControllerState::Error)
         return false;
     out.clear();
-    out.assign(output_regs_.begin(),output_regs_.end());
+    //out.assign(output_regs_.begin(),output_regs_.end());
+    out = output_regs_;
     return true;
 }
 

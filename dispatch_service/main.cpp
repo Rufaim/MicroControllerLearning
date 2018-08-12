@@ -23,9 +23,9 @@ int main(int argv, char** argc) {
     int start_id = 0;
 
     std::string config;
-    if (argv >= 2)
+    if (argv > 2)
         start_id = std::atoi(argc[2]);
-    if (argv >= 1)
+    if (argv > 1)
         config = argc[1];
     else {
         std::cout << "Usage: ./dispatch_service <config_name> [ <start_id> ]" << std::endl;

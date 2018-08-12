@@ -39,7 +39,7 @@ void ProgramExecuter::TaskQueryThreadProc() {
         for (int i =0; i< input_len_; i++ )
             input.push_back(inputs_regs_dis_(gen_));
 
-        report_sub["input"] = input;
+        report_sub["in"] = input;
 
         if (!controller.Init(input,program_)) {
             report_sub["valid"] = false;
@@ -70,10 +70,16 @@ void ProgramExecuter::TaskQueryThreadProc() {
     json unique_res;
 
     for (json &elem : report) {
-        if (std::all_of(unique_res.begin(),unique_res.end(), [&](json a) {
-                return !std::equal(a.begin(),a.end(), elem["out"].begin());
-        })) {
-            unique_res.push_back(elem);
+        if (!elem["error"] and elem["valid"]) {
+            if (std::all_of(unique_res.begin(),unique_res.end(), [&](json a) {
+                    return !std::equal(a.begin(),a.end(), elem["out"].begin());
+            })) {
+                json new_elem = {
+                    {"in", elem["in"]},
+                    {"out", elem["out"]}
+                };
+                unique_res.push_back(new_elem);
+            }
         }
     }
 

@@ -80,7 +80,9 @@ int main(int argv, char** argc) {
 
                 report.push_back(rep);
             } else {
-                boost::filesystem::remove(boost::filesystem::path(active_progs[rep_id]));
+                boost::filesystem::path path = program_safe_dir;
+                path /= active_progs[rep_id];
+                boost::filesystem::remove(boost::filesystem::path(path));
             }
 
             active_progs.erase(rep_id);

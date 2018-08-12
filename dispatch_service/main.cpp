@@ -76,7 +76,7 @@ int main(int argv, char** argc) {
                 rep = { {"ID", rep_id},
                         {"num_unique", num_unique},
                         {"program_path", active_progs[rep_id]},
-                        {"report_path", path.string()}};
+                        {"report_path", name}};
 
                 report.push_back(rep);
             } else {
@@ -99,7 +99,7 @@ int main(int argv, char** argc) {
             boost::filesystem::path path = program_safe_dir;
             path /= name;
             writeProgramToFile(program,path.string());
-            active_progs[program_id] = path.string();
+            active_progs[program_id] = name;
             program_id++;
         } else
             std::this_thread::sleep_for(std::chrono::milliseconds(200));

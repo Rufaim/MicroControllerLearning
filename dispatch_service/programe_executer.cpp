@@ -67,17 +67,18 @@ void ProgramExecuter::TaskQueryThreadProc() {
         report.push_back( report_sub );
     }
 
-    std::vector<std::vector<int>> unique_outs;
+    json unique_res;
 
     for (json &elem : report) {
-        if (std::all_of(unique_outs.begin(),unique_outs.end(), [&](std::vector<int> a) {
-                 return !std::equal(a.begin(),a.end(), elem["out"].begin()); })) {
-            unique_outs.push_back(elem["out"]);
+        if (std::all_of(unique_res.begin(),unique_res.end(), [&](json a) {
+                return !std::equal(a.begin(),a.end(), elem["out"].begin());
+        })) {
+            unique_res.push_back(elem);
         }
     }
 
     report_["ID"] = id_;
-    report_["enties"] = report;
-    report_["num_unique"] = unique_outs.size();
+    report_["enties"] = unique_res;
+    report_["num_unique"] = unique_res.size();
     alive_ = false;
 }

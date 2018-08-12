@@ -37,7 +37,6 @@ ProgrammGenerator::ProgrammGenerator(std::string config_path) {
 
     inputs_regs_dis_ = std::uniform_int_distribution<>(0, num_inputs_regs_-1);
     active_regs_dis_ = std::uniform_int_distribution<>(0, num_active_regs_-1);
-    output_regs_dis_ = std::uniform_int_distribution<>(0, num_output_regs_-1);
 
     const_dis_ = std::uniform_int_distribution<>(lower_const_bound, upper_const_bound);
     command_dis_ = std::uniform_int_distribution<>(0, CommandID::NOP);
@@ -51,9 +50,15 @@ std::vector<std::pair<CommandID, int>> ProgrammGenerator::generate() {
     std::uniform_int_distribution<> pointer_dis(0,prog_len/2);
 
     for (int i=0; i<=prog_len; i++) {
-        Command command = getCommandByID( generate_command_id() );
+        Command command;
+        while (true) {
+            command = getCommandByID( generate_command_id() );
+            if (command.argtype != ArgumentType::OUTPUT_REG)
+                break;
+        }
         int arg = get_random_command_arg(command,pointer_dis);
         result.push_back({command.id,arg});
+
     }
     post_process(result);
     return result;
@@ -69,9 +74,6 @@ int ProgrammGenerator::get_random_command_arg(Command command,
         break;
     case ArgumentType::ACTIVE_REG :
         arg = active_regs_dis_(gen_);
-        break;
-    case ArgumentType::OUTPUT_REG :
-        arg = output_regs_dis_(gen_);
         break;
     case ArgumentType::CONSTANT :
         arg = const_dis_(gen_);
@@ -102,4 +104,9 @@ void ProgrammGenerator::post_process(std::vector<std::pair<CommandID, int> > &pr
     });
     if (ptr != program.begin())
         program.erase(program.begin(), ptr);
+
+    for (int i=0;i<num_output_regs_;i++) {
+        program.push_back({CommandID::REG,active_regs_dis_(gen_)});
+        program.push_back({CommandID::UNLD,i});
+    }
 }

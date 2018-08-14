@@ -6,9 +6,9 @@
     "dispatcher" : {
     	"dir_to_safe_programs" : "./data/programms",
     	"json_to_save_description" : "./data/report.json",
-    	"num_program" : 100000,
+    	"num_program" : 1000000,
     	"num_exec" : 6,
-    	"min_unique" : 100
+    	"min_unique" : 30
 	},
 
     "generator" : {
@@ -23,7 +23,7 @@
     "executer" : {
         "max_tests" : 1000,
 
-        "lower_input_bound" : -100,
-        "upper_input_bound" : 100
+        "lower_input_bound" : -20,
+        "upper_input_bound" : 20
     }
 }

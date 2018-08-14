@@ -37,7 +37,7 @@ int main(int argv, char** argc) {
 
     int num_programms = conf_file_dispatch["num_program"];
     int num_exec = conf_file_dispatch["num_exec"];
-    int min_unique = std::min(conf_file_dispatch["min_unique"].get<int>(),conf_file["executer"]["upper_input_bound"].get<int>()-conf_file["executer"]["lower_input_bound"].get<int>());
+    int min_unique = conf_file_dispatch["min_unique"].get<int>();
     std::string program_safe_dir_str = conf_file_dispatch["dir_to_safe_programs"];
     std::string program_report_file_str = conf_file_dispatch["json_to_save_description"];
 

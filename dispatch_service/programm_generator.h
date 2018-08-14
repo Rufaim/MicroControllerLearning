@@ -29,6 +29,7 @@ private:
 
     std::uniform_int_distribution<> inputs_regs_dis_;
     std::uniform_int_distribution<> active_regs_dis_;
+    std::uniform_int_distribution<> output_regs_dis_;
 
     std::uniform_int_distribution<> const_dis_;
     std::uniform_int_distribution<> command_dis_;

@@ -37,7 +37,7 @@ int main(int argv, char** argc) {
 
     int num_programms = conf_file_dispatch["num_program"];
     int num_exec = conf_file_dispatch["num_exec"];
-    int min_unique = conf_file_dispatch["min_unique"];
+    int min_unique = conf_file_dispatch["min_unique"].get<int>();
     std::string program_safe_dir_str = conf_file_dispatch["dir_to_safe_programs"];
     std::string program_report_file_str = conf_file_dispatch["json_to_save_description"];
 
@@ -80,7 +80,9 @@ int main(int argv, char** argc) {
 
                 report.push_back(rep);
             } else {
-                boost::filesystem::remove(boost::filesystem::path(active_progs[rep_id]));
+                boost::filesystem::path path = program_safe_dir;
+                path /= active_progs[rep_id];
+                boost::filesystem::remove(boost::filesystem::path(path));
             }
 
             active_progs.erase(rep_id);

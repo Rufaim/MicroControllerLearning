@@ -37,6 +37,7 @@ ProgrammGenerator::ProgrammGenerator(std::string config_path) {
 
     inputs_regs_dis_ = std::uniform_int_distribution<>(0, num_inputs_regs_-1);
     active_regs_dis_ = std::uniform_int_distribution<>(0, num_active_regs_-1);
+    output_regs_dis_ = std::uniform_int_distribution<>(0, num_output_regs_-1);
 
     const_dis_ = std::uniform_int_distribution<>(lower_const_bound, upper_const_bound);
     command_dis_ = std::uniform_int_distribution<>(0, CommandID::NOP);
@@ -51,11 +52,7 @@ std::vector<std::pair<CommandID, int>> ProgrammGenerator::generate() {
 
     for (int i=0; i<=prog_len; i++) {
         Command command;
-        while (true) {
-            command = getCommandByID( generate_command_id() );
-            if (command.argtype != ArgumentType::OUTPUT_REG)
-                break;
-        }
+        command = getCommandByID( generate_command_id() );
         int arg = get_random_command_arg(command,pointer_dis);
         result.push_back({command.id,arg});
 
@@ -74,6 +71,9 @@ int ProgrammGenerator::get_random_command_arg(Command command,
         break;
     case ArgumentType::ACTIVE_REG :
         arg = active_regs_dis_(gen_);
+        break;
+    case ArgumentType::OUTPUT_REG :
+        arg = output_regs_dis_(gen_);
         break;
     case ArgumentType::CONSTANT :
         arg = const_dis_(gen_);
@@ -105,8 +105,20 @@ void ProgrammGenerator::post_process(std::vector<std::pair<CommandID, int> > &pr
     if (ptr != program.begin())
         program.erase(program.begin(), ptr);
 
-    for (int i=0;i<num_output_regs_;i++) {
-        program.push_back({CommandID::REG,active_regs_dis_(gen_)});
-        program.push_back({CommandID::UNLD,i});
+
+    std::vector<int> used_output_regs;
+    for (std::pair<CommandID, int>& comm_pair : program) {
+        Command command = getCommandByID( comm_pair.first );
+        if (command.argtype == ArgumentType::OUTPUT_REG)
+            used_output_regs.push_back(comm_pair.second);
+    }
+
+    for (int i =0; i< num_output_regs_; i++ ) {
+        if (std::none_of(used_output_regs.begin(), used_output_regs.end(), [&](int a) {
+                    return a==i;
+        })) {
+            program.push_back({CommandID::REG,active_regs_dis_(gen_)});
+            program.push_back({CommandID::UNLD,output_regs_dis_(gen_)});
+        }
     }
 }

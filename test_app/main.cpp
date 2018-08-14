@@ -6,26 +6,12 @@
 
 int main() {
 
-    std::vector<std::pair<CommandID,int>> program = {
-        { CommandID::LOAD, 0 },
-        { CommandID::ADD, 0 },
-        { CommandID::MULC, -1 },
-        { CommandID::POP, 0 },
-        { CommandID::UNLD, 0 }
-    };
+    std::vector<std::pair<CommandID, int> > program;
 
-    ProgramExecuter executer(1,"/home/pavel/New_programs/MicroController/configs/generator.json", program);
-    executer.TaskQueryThreadProc();
+    readProgramFromFile(program,"/media/pavel/Новый том/data/programms/program_17.txt");
 
-
-    //std::vector<std::pair<CommandID,int>> program2;
-
-    /*
-    writeProgramToFile(program,"./test.txt");
-    readProgramFromFile(program2,"test.txt");
-
-    Controller controller("/home/pavel/New_programs/MicroController/configs/generator.json");
-    if (controller.Init({10}, program2))
+    Controller controller("/media/pavel/Новый том/data/programms/config.json");
+    if (controller.Init({9}, program))
         std::cout << "Valid program" << std::endl;
 
     controller.Evaluate();
@@ -34,6 +20,6 @@ int main() {
 
     if (controller.getOutputRegs(out_regs))
         std::cout << "out received " << out_regs.at(0) << std::endl;
-    */
+
     return 0;
 }

@@ -39,13 +39,12 @@ void ProgramExecuter::TaskQueryThreadProc() {
         for (int i =0; i< input_len_; i++ )
             input.push_back(inputs_regs_dis_(gen_));
 
-        report_sub["input"] = input;
+        report_sub["in"] = json(input);
 
         if (!controller.Init(input,program_)) {
             report_sub["valid"] = false;
             report_sub["error"] = false;
             report_sub["out"] = json::array();
-            continue;
         }
         report_sub["valid"] = true;
 
@@ -54,15 +53,14 @@ void ProgramExecuter::TaskQueryThreadProc() {
         if (controller.getInnerState() != ControllerState::Done) {
             report_sub["error"] = true;
             report_sub["out"] = json::array();
-            continue;
         }
         report_sub["error"] = false;
         std::vector<int> out;
         if(!controller.getOutputRegs(out)) {
-             report_sub["out"] = json::array();
-             continue;
+            report_sub["error"] = true;
+            report_sub["out"] = json::array();
         }
-        report_sub["out"] = out;
+        report_sub["out"] = json(out);
 
         report.push_back( report_sub );
     }
@@ -70,10 +68,16 @@ void ProgramExecuter::TaskQueryThreadProc() {
     json unique_res;
 
     for (json &elem : report) {
-        if (std::all_of(unique_res.begin(),unique_res.end(), [&](json a) {
-                return !std::equal(a.begin(),a.end(), elem["out"].begin());
-        })) {
-            unique_res.push_back(elem);
+        if (!elem["error"] && elem["valid"] && !std::equal(elem["in"].begin(),elem["in"].end(), elem["out"].begin())) {
+            if (std::all_of(unique_res.begin(),unique_res.end(), [&](json a) {
+                    return !std::equal(a["out"].begin(),a["out"].end(), elem["out"].begin());
+            })) {
+                json new_elem = {
+                    {"in", elem["in"]},
+                    {"out", elem["out"]}
+                };
+                unique_res.push_back(new_elem);
+            }
         }
     }
 

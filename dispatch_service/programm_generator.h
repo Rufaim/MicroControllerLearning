@@ -39,6 +39,7 @@ private:
     const std::vector<CommandID> service_commands_ = { CommandID::POP,
                      CommandID::LOAD, CommandID::UNLD, CommandID::PUSH, CommandID::REG };
     const std::vector<ArgumentType> post_neglet_arg_type_ = { ArgumentType::NONE, ArgumentType::ACTIVE_REG};
+    const ArgumentType post_neglet_arg_type_2_ = ArgumentType::OUTPUT_REG;
 };
 
 #endif // PROGRAMM_GENERATOR_H

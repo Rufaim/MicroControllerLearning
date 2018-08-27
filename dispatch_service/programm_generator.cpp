@@ -50,7 +50,7 @@ std::vector<std::pair<CommandID, int>> ProgrammGenerator::generate() {
     std::vector<std::pair<CommandID, int>> result;
     std::uniform_int_distribution<> pointer_dis(0,prog_len/2);
 
-    for (int i=0; i<=prog_len; i++) {
+    for (int i=0; i<prog_len; i++) {
         Command command;
         command = getCommandByID( generate_command_id() );
         int arg = get_random_command_arg(command,pointer_dis);

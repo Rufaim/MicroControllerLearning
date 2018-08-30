@@ -18,6 +18,7 @@ public:
     void TaskQueryThreadProc();
 
     json getReport() { return report_; }
+    std::vector<std::pair<CommandID,int>> getProgram() { return program_; }
 
 private:
     int id_;

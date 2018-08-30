@@ -35,7 +35,7 @@ int main(int argv, char** argc) {
     readJSONFromFile(conf_file,config);
     json conf_file_dispatch = conf_file["dispatcher"];
 
-    int num_programms = conf_file_dispatch["num_program"];
+    long num_programms = conf_file_dispatch["num_program"];
     int num_exec = conf_file_dispatch["num_exec"];
     int min_unique = conf_file_dispatch["min_unique"].get<int>();
     std::string program_safe_dir_str = conf_file_dispatch["dir_to_safe_programs"];
@@ -47,7 +47,7 @@ int main(int argv, char** argc) {
     if (!boost::filesystem::exists(program_safe_dir))
         boost::filesystem::create_directories((program_safe_dir));
 
-    boost::filesystem::path path = program_safe_dir;
+    boost::filesystem::path path = program_report_file.parent_path();
     path /= "config.json";
     writeJSONToFile(conf_file, path.string());
 
@@ -55,7 +55,6 @@ int main(int argv, char** argc) {
     json report;
 
     std::vector<std::shared_ptr<ProgramExecuter>> executers;
-    std::map<int,std::string> active_progs;
 
     for (int program_id=start_id, processed=0; processed < num_programms && !stop; ) {
         auto res = std::find_if_not(executers.begin(),executers.end(), [&](std::shared_ptr<ProgramExecuter>& exec) {
@@ -68,24 +67,26 @@ int main(int argv, char** argc) {
             int num_unique = rep["num_unique"];
             int rep_id = rep["ID"];
             if (num_unique >= min_unique) {
-                std::string name = "report_prog" + std::to_string(rep_id) +".json";
+                std::string name_rep = "report_prog" + std::to_string(rep_id) +".json";
                 boost::filesystem::path path = program_safe_dir;
-                path /= name;
+                path /= name_rep;
                 writeJSONToFile(rep,path.string());
+
+                std::string name_prog = "program_" + std::to_string(rep_id)+".txt";
+                path = program_safe_dir;
+                path /= name_prog;
+                std::vector<std::pair<CommandID,int>> program = (*res)->getProgram();
+
+                writeProgramToFile(program,path.string());
 
                 rep = { {"ID", rep_id},
                         {"num_unique", num_unique},
-                        {"program_path", active_progs[rep_id]},
-                        {"report_path", name}};
+                        {"program_path", name_prog},
+                        {"report_path", name_rep}};
 
                 report.push_back(rep);
-            } else {
-                boost::filesystem::path path = program_safe_dir;
-                path /= active_progs[rep_id];
-                boost::filesystem::remove(boost::filesystem::path(path));
             }
 
-            active_progs.erase(rep_id);
             executers.erase(res);
             processed++;
         }
@@ -97,18 +98,13 @@ int main(int argv, char** argc) {
             executers.push_back(exec);
             exec->Start();
 
-            std::string name = "program_" + std::to_string(program_id)+".txt";
-            boost::filesystem::path path = program_safe_dir;
-            path /= name;
-            writeProgramToFile(program,path.string());
-            active_progs[program_id] = name;
             program_id++;
         } else
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
     do {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     } while (std::any_of(executers.begin(),executers.end(), [&](std::shared_ptr<ProgramExecuter>& exec) {
                          return exec->isActive();
                     } ));

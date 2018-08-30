@@ -50,7 +50,7 @@ std::vector<std::pair<CommandID, int>> ProgrammGenerator::generate() {
     std::vector<std::pair<CommandID, int>> result;
     std::uniform_int_distribution<> pointer_dis(0,prog_len/2);
 
-    for (int i=0; i<=prog_len; i++) {
+    for (int i=0; i<prog_len; i++) {
         Command command;
         command = getCommandByID( generate_command_id() );
         int arg = get_random_command_arg(command,pointer_dis);
@@ -106,19 +106,26 @@ void ProgrammGenerator::post_process(std::vector<std::pair<CommandID, int> > &pr
         program.erase(program.begin(), ptr);
 
 
-    std::vector<int> used_output_regs;
+    std::vector<bool> used_output_regs(num_output_regs_,false);
     for (std::pair<CommandID, int>& comm_pair : program) {
         Command command = getCommandByID( comm_pair.first );
         if (command.argtype == ArgumentType::OUTPUT_REG)
-            used_output_regs.push_back(comm_pair.second);
+            used_output_regs.at(comm_pair.second) = true;
     }
 
-    for (int i =0; i< num_output_regs_; i++ ) {
-        if (std::none_of(used_output_regs.begin(), used_output_regs.end(), [&](int a) {
-                    return a==i;
-        })) {
-            program.push_back({CommandID::REG,active_regs_dis_(gen_)});
-            program.push_back({CommandID::UNLD,output_regs_dis_(gen_)});
+    if (std::all_of(used_output_regs.begin(),used_output_regs.end(), [&](bool a) { return a; })) {
+        auto ptr = std::find_if(program.begin(),program.end(), [&] (std::pair<CommandID, int>& comm_pair) {
+                Command command = getCommandByID( comm_pair.first );
+                return command.argtype == post_neglet_arg_type_2_;
+        });
+        if (ptr != program.end())
+            program.erase(ptr, program.end());
+    } else {
+        for (int i =0; i< num_output_regs_; i++ ) {
+            if (!used_output_regs.at(i)) {
+                program.push_back({CommandID::REG,active_regs_dis_(gen_)});
+                program.push_back({CommandID::UNLD, i });
+            }
         }
     }
 }
